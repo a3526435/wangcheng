@@ -18,6 +18,7 @@ import {
   Send,
   Bot
 } from 'lucide-react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const SYSTEM_PROMPT_TEXT = `
 你是一个专业的足球数据分析AI助手，名为“北京有料大叔AI”。
@@ -180,6 +181,7 @@ export default function App() {
           <div className="p-4 border-t flex gap-2"><input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSendMessage()} className="flex-1 bg-gray-100 rounded-lg px-4 py-2 text-sm outline-none" placeholder="分析 曼城 vs 利物浦" /><button onClick={handleSendMessage} className="bg-[#B22222] text-[#FFD700] p-2 rounded-lg"><Send /></button></div>
         </div>
       )}
+      <SpeedInsights />
     </div>
   );
 }
