@@ -19,38 +19,7 @@ import {
   Bot
 } from 'lucide-react';
 
-const SYSTEM_PROMPT_TEXT = `
-你是一个专业的足球数据分析AI助手，名为“北京有料大叔AI”。
-你的核心分析逻辑基于进攻、防守、控球、球员状态、战术、战意、环境、机构指数等八大维度。
-如果是分析比赛，请务必在回复的最后，包含一个JSON数据块，格式如下：
-\`\`\`json
-{
-  "homeTeam": "主队名称",
-  "awayTeam": "客队名称",
-  "homeScore": 85,
-  "awayScore": 82,
-  "prediction": "预测结论",
-  "data": {
-    "attack": [8个指标],
-    "attack_away": [8个指标],
-    "defense": [...],
-    "defense_away": [...],
-    "possession": [5个指标],
-    "possession_away": [5个指标],
-    "status": [3个指标],
-    "status_away": [3个指标],
-    "tactics": [3个指标],
-    "tactics_away": [3个指标],
-    "intent": [3个指标],
-    "intent_away": [3个指标],
-    "env": [3个指标],
-    "env_away": [3个指标],
-    "odds": [3个指标],
-    "odds_away": [3个指标]
-  }
-}
-\`\`\`
-`;
+const SYSTEM_PROMPT_TEXT = "你是一个专业的足球数据分析AI助手，名为“北京有料大叔AI”。分析逻辑需包含xG、xGA等量化指标。如果是分析比赛，请务必在回复的最后包含对应的JSON数据块。";
 
 const DATA_MODEL = [
   { id: 'attack', title: '一、进攻端指标', weight: '30%', icon: <Target className="w-5 h-5" />, color: 'text-red-600', indicators: [{ name: 'xG (期望进球)', weight: 0.08, desc: '官方/专业平台直接取值' }, { name: 'xA (助攻期望)', weight: 0.05, desc: '反映传球创造进球能力' }, { name: '射门转化率', weight: 0.04, desc: '进球数÷总射门数' }, { name: '有效传中数', weight: 0.03, desc: '传中至禁区形成接球' }, { name: '创造绝对机会', weight: 0.03, desc: '单刀/空门次数' }, { name: '进攻三区触球', weight: 0.03, desc: '对方半场前30米触球' }, { name: '反击进球率', weight: 0.02, desc: '反击进球÷反击次数' }, { name: '定位球成功率', weight: 0.02, desc: '定位球进球÷次数' }] },
@@ -72,7 +41,7 @@ export default function App() {
   const [aiPredictionText, setAiPredictionText] = useState("正在初始化 AI 分析模型...");
   const [totalScores, setTotalScores] = useState({ home: 0, away: 0 });
   const [chatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState([{ role: 'ai', text: '你好！我是“北京有料大叔AI”。你可以输入“分析 曼城 vs 利物浦”来尝试实时建模。' }]);
+  const [messages, setMessages] = useState([{ role: 'ai', text: '你好！我是“北京有料大叔AI”。输入“分析 曼城 vs 利物浦”开始预测。' }]);
   const [userInput, setUserInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
@@ -130,37 +99,49 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#8B0000] pb-10">
-      <header className="bg-[#B22222] border-b-4 border-[#FFD700] py-8 text-center">
-        <h1 className="text-3xl font-bold text-[#FFD700] tracking-widest">北京有料大叔足球分析</h1>
+      <header className="bg-[#B22222] border-b-4 border-[#FFD700] py-8 text-center shadow-xl">
+        <h1 className="text-3xl font-bold text-[#FFD700] tracking-widest uppercase">北京有料大叔足球分析</h1>
+        <p className="text-[#FFD700]/70 text-xs mt-2 font-bold tracking-widest">REAL-TIME DATA QUANTITATIVE ANALYSIS</p>
       </header>
       <main className="max-w-4xl mx-auto px-4 -mt-6">
         <div className="bg-[#FFF8E7] rounded-2xl shadow-2xl border-4 border-[#FFD700] p-8 flex flex-col md:flex-row items-center justify-between mb-8">
           <div className="text-center flex-1">
-            <div className="text-2xl font-black mb-4">{teams.home.name}</div>
-            <div className="w-24 h-24 mx-auto rounded-full border-4 border-red-500 flex items-center justify-center bg-white text-3xl font-bold">{totalScores.home}</div>
+            <div className="text-2xl font-black mb-4 text-gray-800">{teams.home.name}</div>
+            <div className="w-24 h-24 mx-auto rounded-full border-4 border-red-500 flex items-center justify-center bg-white text-3xl font-bold text-red-600 shadow-inner">{totalScores.home}</div>
           </div>
-          <div className="flex flex-col items-center gap-4">
-            <div className="text-3xl font-black text-[#B22222]">VS</div>
-            <button onClick={() => setChatOpen(true)} className="bg-[#B22222] text-[#FFD700] px-6 py-2 rounded-full font-bold border-2 border-[#FFD700] flex items-center gap-2 shadow-lg"><MessageSquare size={18} /> 对阵分析</button>
+          <div className="flex flex-col items-center gap-4 py-6 md:py-0">
+            <div className="text-4xl font-black text-[#B22222] italic drop-shadow-sm">VS</div>
+            <button onClick={() => setChatOpen(true)} className="bg-[#B22222] text-[#FFD700] px-6 py-2 rounded-full font-bold border-2 border-[#FFD700] flex items-center gap-2 shadow-lg hover:scale-105 transition-transform"><MessageSquare size={18} /> AI 深度预测</button>
+            <div className="text-[10px] font-bold text-[#8B0000] bg-[#FFD700]/20 px-3 py-1 rounded-md border border-[#FFD700]/30">{aiPredictionText}</div>
           </div>
           <div className="text-center flex-1">
-            <div className="text-2xl font-black mb-4">{teams.away.name}</div>
-            <div className="w-24 h-24 mx-auto rounded-full border-4 border-blue-500 flex items-center justify-center bg-white text-3xl font-bold">{totalScores.away}</div>
+            <div className="text-2xl font-black mb-4 text-gray-800">{teams.away.name}</div>
+            <div className="w-24 h-24 mx-auto rounded-full border-4 border-blue-500 flex items-center justify-center bg-white text-3xl font-bold text-blue-600 shadow-inner">{totalScores.away}</div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {DATA_MODEL.map((cat) => (
-            <div key={cat.id} className="bg-[#FFF8E7] rounded-xl border border-[#FFD700]/40 overflow-hidden">
-              <div onClick={() => setExpandedSection(expandedSection === cat.id ? null : cat.id)} className="bg-[#FFF0D4] p-4 flex items-center justify-between cursor-pointer">
-                <span className="font-bold flex items-center gap-2">{cat.icon} {cat.title}</span>
-                {expandedSection === cat.id ? <ChevronUp /> : <ChevronDown />}
+            <div key={cat.id} className="bg-[#FFF8E7] rounded-xl border border-[#FFD700]/40 overflow-hidden shadow-sm">
+              <div onClick={() => setExpandedSection(expandedSection === cat.id ? null : cat.id)} className="bg-[#FFF0D4] p-4 flex items-center justify-between cursor-pointer active:bg-[#FFE8BC] transition-colors">
+                <span className="font-bold flex items-center gap-2 text-gray-700">{cat.icon} {cat.title} <span className="text-[10px] font-normal text-gray-400">({cat.weight})</span></span>
+                {expandedSection === cat.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </div>
               {expandedSection === cat.id && data && (
-                <div className="p-4 space-y-4">
+                <div className="p-4 space-y-5 bg-white/50">
                   {data[cat.id].map((ind, i) => (
                     <div key={i}>
-                      <div className="flex justify-between text-xs mb-1"><span>{ind.name}</span><span>{ind.homeValue} : {ind.awayValue}</span></div>
-                      <div className="flex gap-2"><div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden"><div className="h-full bg-red-600 ml-auto" style={{width: `${ind.homeValue}%`}} /></div><div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden"><div className="h-full bg-blue-600" style={{width: `${ind.awayValue}%`}} /></div></div>
+                      <div className="flex justify-between text-[11px] font-bold text-gray-500 mb-1">
+                        <span className="flex items-center gap-1">{ind.name} <Info size={10} className="text-gray-300" /></span>
+                        <span className="font-mono">{ind.homeValue} : {ind.awayValue}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-red-500 ml-auto transition-all duration-500" style={{width: `${ind.homeValue}%`}} />
+                        </div>
+                        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-blue-500 transition-all duration-500" style={{width: `${ind.awayValue}%`}} />
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -169,15 +150,19 @@ export default function App() {
           ))}
         </div>
       </main>
-      <button onClick={() => setChatOpen(!chatOpen)} className="fixed bottom-8 right-8 bg-[#FFD700] p-4 rounded-full shadow-2xl border-2 border-[#8B0000] z-[100]">{chatOpen ? <X /> : <MessageSquare />}</button>
+      <button onClick={() => setChatOpen(!chatOpen)} className="fixed bottom-6 right-6 bg-[#FFD700] p-4 rounded-full shadow-2xl border-4 border-[#8B0000] z-[100] active:scale-90 transition-transform">{chatOpen ? <X className="text-[#8B0000]" /> : <MessageSquare className="text-[#8B0000]" />}</button>
       {chatOpen && (
-        <div className="fixed bottom-24 right-4 w-[90%] md:w-[400px] h-[500px] bg-white rounded-xl shadow-2xl border-2 border-[#B22222] z-[99] flex flex-col overflow-hidden">
-          <div className="bg-[#B22222] p-4 text-[#FFD700] font-bold">AI 数据中心</div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            {messages.map((m, i) => <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`p-3 rounded-xl text-sm ${m.role === 'user' ? 'bg-[#B22222] text-white' : 'bg-white border'}`}>{m.text}</div></div>)}
+        <div className="fixed bottom-24 right-4 w-[92%] md:w-[400px] h-[550px] bg-white rounded-2xl shadow-2xl border-2 border-[#B22222] z-[99] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4">
+          <div className="bg-[#B22222] p-4 text-[#FFD700] font-bold flex items-center gap-2"><Bot size={20} /> 有料大叔 AI 数据中心</div>
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+            {messages.map((m, i) => <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`p-3 rounded-2xl text-sm leading-relaxed ${m.role === 'user' ? 'bg-[#B22222] text-white rounded-tr-none shadow-md' : 'bg-white border text-gray-700 rounded-tl-none shadow-sm'}`}>{m.text}</div></div>)}
+            {isTyping && <div className="text-[10px] text-gray-400 animate-pulse italic">AI 正在根据八大指标建模中...</div>}
             <div ref={messagesEndRef} />
           </div>
-          <div className="p-4 border-t flex gap-2"><input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSendMessage()} className="flex-1 bg-gray-100 rounded-lg px-4 py-2 text-sm outline-none" placeholder="分析 曼城 vs 利物浦" /><button onClick={handleSendMessage} className="bg-[#B22222] text-[#FFD700] p-2 rounded-lg"><Send /></button></div>
+          <div className="p-4 border-t bg-white flex gap-2">
+            <input type="text" value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSendMessage()} className="flex-1 bg-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#B22222]/20" placeholder="分析 皇家马德里 vs 拜仁" />
+            <button onClick={handleSendMessage} disabled={!userInput.trim() || isTyping} className="bg-[#B22222] text-[#FFD700] p-3 rounded-xl hover:bg-red-800 disabled:opacity-50"><Send size={20} /></button>
+          </div>
         </div>
       )}
     </div>
