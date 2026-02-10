@@ -18,6 +18,7 @@ import {
   Send,
   Bot
 } from 'lucide-react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 const SYSTEM_PROMPT_TEXT = "你是一个专业的足球数据分析AI助手，名为“北京有料大叔AI”。分析逻辑需包含xG、xGA等量化指标。如果是分析比赛，请务必在回复的最后包含对应的JSON数据块。";
 
@@ -165,6 +166,7 @@ export default function App() {
           </div>
         </div>
       )}
+      <SpeedInsights />
     </div>
   );
 }
